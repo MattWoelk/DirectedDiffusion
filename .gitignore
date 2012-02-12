@@ -1,0 +1,10 @@
+.project
+documentation/*
+*.swp
+.classpath
+*.class
+*.pdf
+*.ppt*
+*.zip
+first/*
+second/*
