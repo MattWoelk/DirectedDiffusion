@@ -8,8 +8,8 @@ public class NodeTest
 
   public static void main(String[] args)
   {
-    ArrayList<Point> gridPoints = new ArrayList();
-    ArrayList<Node> allNodes = new ArrayList();
+    ArrayList<Point> gridPoints = new ArrayList<Point>();
+    ArrayList<Node> allNodes = new ArrayList<Node>();
 
     for(int i = 0; i < dimension; i++)  //Initializes grid points
       for(int j = 0; j < dimension; j++)
