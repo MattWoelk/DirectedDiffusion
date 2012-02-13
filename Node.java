@@ -5,12 +5,12 @@ public class Node
   int nodeID, xCoord, yCoord, radioRange, numNodes, neighborSize;
   ArrayList<Node> allNodes = new ArrayList<Node>();
   ArrayList<Node> myNeighbors = new ArrayList<Node>();
-  EDReceive ERec = new EDReceive();
-  PacketTransmitter PTrans = new PacketTransmitter();
-  PacketReceiver PRec = new PacketReceiver();
-  RnFDataSend RSend = new RnFDataSend();
-  ExpDataSend ESend = new ExpDataSend();
-  ArrayList<Gradient> Gradients = new ArrayList<Gradient>();
+  EDReceive eRecv = new EDReceive();
+  PacketTransmitter pktTrans = new PacketTransmitter();
+  PacketReceiver pktRecv = new PacketReceiver();
+  RnFDataSend rnfSend = new RnFDataSend();
+  ExpDataSend expSend = new ExpDataSend();
+  ArrayList<Gradient> gradients = new ArrayList<Gradient>();
 
   public Node(int nodeID, int xCoord, int yCoord, int radioRange, int numNodes)
   {
@@ -75,7 +75,7 @@ public class Node
       System.out.print("\t("+ myNeighbors.get(i).getXCoord()+","+myNeighbors.get(i).getYCoord()+ ")\n");
     }
 
-    PTrans.setNeighbors(myNeighbors);
+    pktTrans.setNeighbors(myNeighbors);
   }
 
   public boolean processNode()
@@ -93,6 +93,6 @@ public class Node
 
   public void receivePacket(Packet pkt)
   {
-    PRec.receivePacket(pkt);
+    pktRecv.receivePacket(pkt);
   }
 }
