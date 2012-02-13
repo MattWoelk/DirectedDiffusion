@@ -13,7 +13,7 @@ public class EDReceive
     senders = new ArrayList<Sender>();
   }
 
-  private Sender senderExist( long SenderID )
+  private Sender senderExist( long senderID )
   {
     Sender sender = null;
     Iterator<Sender> it = senders.iterator();
@@ -22,83 +22,83 @@ public class EDReceive
     {
       Sender s = it.next();
 
-      if( s.getID() == SenderID )
+      if( s.getID() == senderID )
         sender = s;
     }
 
     return sender;
   }
 
-  public long getSeqNum( long SenderID )
+  public long getSeqNum( long senderID )
   {
-    long SequenceNumber = Sender.INVALID;
-    Sender s = senderExist( SenderID );
+    long sequenceNumber = Sender.INVALID;
+    Sender s = senderExist( senderID );
 
     if( null != s )
-      SequenceNumber = s.getSequenceNumber();
+      sequenceNumber = s.getSequenceNumber();
 
-    return SequenceNumber;
+    return sequenceNumber;
   }
 
-  public boolean updateSeqNum( long SenderID, long SequenceNumber )
+  public boolean updateSeqNum( long senderID, long sequenceNumber )
   {
-    Sender s = senderExist( SenderID );
+    Sender s = senderExist( senderID );
 
     if( null != s )
     {
-      s.setSequenceNum( SequenceNumber );
+      s.setSequenceNum( sequenceNumber );
       return true;
     }
 
     return false;
   }
 
-  public boolean addSender( long SenderID )
+  public boolean addSender( long senderID )
   {
-    Sender s = new Sender( SenderID );
+    Sender s = new Sender( senderID );
     senders.add( s );
     return true;
   }
 
   public class Sender
   {
-    private long SenderID;
-    private long SequenceNumber;
+    private long senderID;
+    private long sequenceNumber;
     private Date timestamp;
 
     public static final long INVALID = -1;
 
-    public Sender( long SenderID, long SequenceNumber, Date timestamp )
+    public Sender( long senderID, long sequenceNumber, Date timestamp )
     {
-      this.SenderID = SenderID;
-      this.SequenceNumber = SequenceNumber;
+      this.senderID = SenderID;
+      this.sequenceNumber = sequenceNumber;
       this.timestamp = timestamp;
     }
 
-    public Sender( long SenderID )
+    public Sender( long senderID )
     {
-//      this( SenderID, Sender.INVALID, Calendar.getInstance().getTime() ); // TODO: fix this and then uncomment it. 
+//      this( senderID, Sender.INVALID, Calendar.getInstance().getTime() ); // TODO: fix this and then uncomment it. 
 //commented because of error:
 //
 //EDReceive.java:80: cannot find symbol
 //symbol  : variable Calendar
 //location: class EDReceive.Sender
-//      this( SenderID, Sender.INVALID, Calendar.getInstance().getTime() );
+//      this( senderID, Sender.INVALID, Calendar.getInstance().getTime() );
     }
 
     public long getID()
     {
-      return SenderID;
+      return senderID;
     }
 
-    public long getSequenceNumber()
+    public long getsequenceNumber()
     {
-      return SequenceNumber;
+      return sequenceNumber;
     }
 
-    public void setSequenceNum( long SequenceNumber )
+    public void setSequenceNum( long sequenceNumber )
     {
-      this.SequenceNumber = SequenceNumber;
+      this.sequenceNumber = sequenceNumber;
     }
   }
 }
