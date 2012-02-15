@@ -1,3 +1,5 @@
+import java.sql.Date;
+
 public class Packet
 {
   private char packetType;

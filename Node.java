@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.sql.Date;
 
 public class Node
 {
@@ -86,7 +87,13 @@ public class Node
 
   public void broadcastInterestMessage(Interest intr)
   {
-    Packet pkt = new Packet();
+    //just some values for now TODO: change them to make sense.
+    char packetType = 'a';
+    String senderID = "senderIDtest";
+    double seqNumber = 1337;
+    Date interval = new Date(1337);
+
+    Packet pkt = new Packet(packetType, senderID, seqNumber, interval);
     //TODO: build broad interest message to be sent to PacketTransmitter
 //    PTrans.addPacket(pkt);
   }

@@ -70,7 +70,7 @@ public class EDReceive
 
     public Sender( long senderID, long sequenceNumber, Date timestamp )
     {
-      this.senderID = SenderID;
+      this.senderID = senderID;
       this.sequenceNumber = sequenceNumber;
       this.timestamp = timestamp;
     }
@@ -91,7 +91,7 @@ public class EDReceive
       return senderID;
     }
 
-    public long getsequenceNumber()
+    public long getSequenceNumber()
     {
       return sequenceNumber;
     }
