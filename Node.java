@@ -13,6 +13,8 @@ public class Node
   ExpDataSend expSend = new ExpDataSend();
   ArrayList<Gradient> gradients = new ArrayList<Gradient>();
 
+  boolean TESTING = false;
+
   public Node(int nodeID, int xCoord, int yCoord, int radioRange, int numNodes)
   {
     this.nodeID = nodeID;
@@ -20,7 +22,7 @@ public class Node
     this.yCoord = yCoord;
     this.radioRange = radioRange;
     this.numNodes = numNodes;
-    System.out.print("Node: "+nodeID+" has been created: ("+this.xCoord+","+this.yCoord+")\n");
+    if(TESTING)System.out.print("Node: "+nodeID+" has been created: ("+this.xCoord+","+this.yCoord+")\n");
     //System.out.print("numNodes = "+this.numNodes);
   }
 
@@ -46,9 +48,10 @@ public class Node
 
   public void findNeighbors()
   {
+    //System.out.println("numNodes: " + numNodes);
     for(int i=0; i<numNodes; i++)
     {
-      if(this.xCoord != allNodes.get(i).xCoord && this.yCoord != allNodes.get(i).yCoord)
+      if(this.xCoord != allNodes.get(i).xCoord || this.yCoord != allNodes.get(i).yCoord)
       {
         int xDiff = Math.abs(allNodes.get(i).xCoord - this.xCoord);
         int yDiff = Math.abs(allNodes.get(i).yCoord - this.yCoord);
@@ -64,16 +67,16 @@ public class Node
     int neighborSize = myNeighbors.size();
     if(neighborSize==0)
     {
-      System.out.print("Neighbor size = "+neighborSize+" Exit now.\n");
-      System.exit(0);
+      if(TESTING)System.out.print("Neighbor size = "+neighborSize+" Exit now.\n");
+      if(TESTING)System.exit(0);
     }else{
-      System.out.print("Neighbor size = "+neighborSize+"\n");
+      if(TESTING)System.out.print("Neighbor size = "+neighborSize+"\n");
     }
 
-    System.out.print("Neigbors of Node ("+ xCoord+","+yCoord+ "):\n");
+    if(TESTING)System.out.print("Neigbors of Node ("+ xCoord+","+yCoord+ "):\n");
     for(int i=0; i<neighborSize; i++)
     {
-      System.out.print("\t("+ myNeighbors.get(i).getXCoord()+","+myNeighbors.get(i).getYCoord()+ ")\n");
+      if(TESTING)System.out.print("\t("+ myNeighbors.get(i).getXCoord()+","+myNeighbors.get(i).getYCoord()+ ")\n");
     }
 
     pktTrans.setNeighbors(myNeighbors);
@@ -81,7 +84,7 @@ public class Node
 
   public boolean processNode()
   {
-    System.out.print("Node = "+this.nodeID+" is processing its node"+"\n");
+    if(TESTING)System.out.print("Node = "+this.nodeID+" is processing its node"+"\n");
     return false; //or true depending on if processing was successful
   }
 
@@ -98,8 +101,18 @@ public class Node
 //    PTrans.addPacket(pkt);
   }
 
+  public ArrayList<Node> getNeighbours()
+  {
+    return myNeighbors;
+  }
+
   public void receivePacket(Packet pkt)
   {
     pktRecv.receivePacket(pkt);
+  }
+
+  public Packet lastReceivedPacketTest()
+  {
+    return pktRecv.getPacket();
   }
 }
