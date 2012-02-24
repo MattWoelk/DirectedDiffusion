@@ -122,8 +122,8 @@ public class NodeTest
       nods.get(1).setAllNodes(nods);
       nods.get(0).findNeighbors();
       nods.get(1).findNeighbors();
-      ExpDataSend exTest = new ExpDataSend();
-      exTest.EDSendFlag();
+      ExpDataSend exTest = new ExpDataSend(1, nods.get(0), new Interest(0));
+      //exTest.EDSendFlag();
     }
 
     if(testPacketReceiver || arg.toLowerCase().equals("packetreceiver"))

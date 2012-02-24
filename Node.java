@@ -10,7 +10,7 @@ public class Node
   PacketTransmitter pktTrans = new PacketTransmitter();
   PacketReceiver pktRecv = new PacketReceiver();
   RnFDataSend rnfSend = new RnFDataSend();
-  ExpDataSend expSend = new ExpDataSend();
+  ArrayList<ExpDataSend> expSends = new ArrayList<ExpDataSend>();
   ArrayList<Gradient> gradients = new ArrayList<Gradient>();
 
   boolean TESTING = false;
