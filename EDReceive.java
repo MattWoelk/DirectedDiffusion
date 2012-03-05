@@ -101,4 +101,8 @@ public class EDReceive
       this.sequenceNumber = sequenceNumber;
     }
   }
+
+  public void run()
+  {
+  }
 }

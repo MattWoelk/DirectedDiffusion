@@ -7,10 +7,11 @@ import java.sql.Date;
 public class NodeTest
 {
   static int dimension = 4, numNodes = 10, radioRange = 4; //will be set by user
+  public static int currentTime = 0;
 
   public static void main(String[] args)
   {
-    String tmp = args[0];
+    String tmp = (args.length == 0) ? "" : args[0];
     if(tmp.toLowerCase().equals("unittest"))
     {
       if(args.length >= 2)
@@ -81,6 +82,7 @@ public class NodeTest
 
     if(testNode || arg.toLowerCase().equals("node"))
     {
+      currentTime = 0;
       System.out.println("\n,.~*TESTING NODE!*~.,\n");
       ArrayList<Node> nods = new ArrayList<Node>();
       System.out.println("Testing Node neighbouring:");
@@ -114,6 +116,7 @@ public class NodeTest
 
     if(testExpDataSend || arg.toLowerCase().equals("expdatasend"))
     {
+      currentTime = 0;
       System.out.println("\n,.~*TESTING ExpDataSend!*~.,\n");
       ArrayList<Node> nods = new ArrayList<Node>();
       nods.add(new Node(0, 0, 0, 10, 2));
@@ -123,6 +126,10 @@ public class NodeTest
       nods.get(0).findNeighbors();
       nods.get(1).findNeighbors();
       ExpDataSend exTest = new ExpDataSend(1, nods.get(0), new Interest(0));
+      for(int i = 0; i < nods.size(); i++)
+      {
+        nods.get(i).run(); //TODO: fix and get working
+      }
       //exTest.EDSendFlag();
     }
 
@@ -166,8 +173,8 @@ public class NodeTest
       nods.get(1).setAllNodes(nods);
       nods.get(0).findNeighbors();
       nods.get(1).findNeighbors();
-      RnFDataSend exTest = new RnFDataSend();
-      exTest.RnFSendFlag();
+      //RnFDataSend exTest = new RnFDataSend(10110, nods.get(0));
+      //exTest.RnFSendFlag();
     }
   }
 

@@ -9,7 +9,7 @@ public class Node
   EDReceive eRecv = new EDReceive();
   PacketTransmitter pktTrans = new PacketTransmitter();
   PacketReceiver pktRecv = new PacketReceiver();
-  RnFDataSend rnfSend = new RnFDataSend();
+  RnFDataSend rnfSend = new RnFDataSend(10110, this);
   ArrayList<ExpDataSend> expSends = new ArrayList<ExpDataSend>();
   ArrayList<Gradient> gradients = new ArrayList<Gradient>();
 
@@ -114,5 +114,18 @@ public class Node
   public Packet lastReceivedPacketTest()
   {
     return pktRecv.getPacket();
+  }
+
+  public void run()
+  {
+    eRecv.run();
+    pktTrans.run();
+    pktRecv.run();
+    rnfSend.run();
+
+    for (ExpDataSend e : expSends)
+    {
+      e.run();
+    }
   }
 }

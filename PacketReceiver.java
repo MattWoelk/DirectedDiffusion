@@ -42,6 +42,10 @@ public class PacketReceiver
   {
     myRecPac.add(pkt);
   }
+
+  public void run()
+  {
+  }
 }
 
 class Nodes
