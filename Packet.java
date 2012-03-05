@@ -1,33 +1,15 @@
-import java.sql.Date;
-
-public class Packet
+public class Packet implements Cloneable
 {
-  private char packetType;
-  private String senderID;
-  private double seqNumber;
-  private Date interval;
+  public Node node;       // The Node which sent this packet
+  public PacketType type; // which of the four from the PacketType enum.
+  public long id;         // id of the initial request; each has a unique id.
+  public boolean ifsent;  // so nodes can easily keep track of if they're sent this packet or not
 
-  public Packet(char packetType, String senderID, double seqNumber, Date interval)
+  public Packet(Node node, PacketType type, long id, boolean ifsent)
   {
-    this.packetType = packetType;
-    this.senderID = senderID;
-    this.seqNumber = seqNumber;
-    this.interval = interval;
-  }
-
-  public char getPacketType(){
-    return packetType;
-  }
-
-  public String getSenderID(){
-    return senderID;
-  }
-
-  public double getSeqNum(){
-    return seqNumber;
-  }
-
-  public Date getInterval(){
-    return interval;
+    this.node = node;
+    this.type = type;
+    this.id = id;
+    this.ifsent = false;
   }
 }

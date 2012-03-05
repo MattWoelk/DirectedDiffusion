@@ -20,10 +20,11 @@ Each Node that receives it sends it along and stores it as well
 
 
 Lists:
-- interests (with sender node, type, id, and ifsent)
-- exploratory data (which sender node, type, id, and ifsent)
-- unsent reinforcements
-- unsent reinforced data
+- interests              ( with sender node, type, id, and ifsent          ) broadcast
+- exploratory data       ( with sender node, type, id,     ifsent, and data) broadcast
+- reinforcements         ( with sender node, type, id, and ifsent          ) monocast
+- unsent reinforced data ( with sender node, type, id,             and data) monocast
+  - sent to the corresponding reinforcement id
 
 Take in packet. Parse it. It is either an interest, exp data, or reinforcement
 
@@ -34,6 +35,8 @@ reinfData: monocast ; known: to and data
 
 
 What to do if the following is received:
+
+- all share the same ID
 
 interest
   - store who sent it for this id (only store one per id)
@@ -67,3 +70,16 @@ How to do timings:
   class.
 
 In run(), all of the sending of information happens.
+  - send interest
+  - send expdata
+  - send reinforcement
+  - generate data (send reinforced data)
+    - wait for the reinforcement data before sending these for the first time
+    - after the first time, just send them every few time ticks or something
+
+
+
+
+Things to keep in mind:
+Should there be a global counter of id so that none are every repeated ???
+  - doesn't really have an analog in reality.
