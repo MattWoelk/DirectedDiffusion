@@ -35,6 +35,33 @@ public class NodeTest
 
     Collections.shuffle(allNodes);  //Randomizes the order of the nodes in the list.
     System.out.println("Shuffled nodes.");
+
+    //seed the first node with an interest
+    allNodes.get(0).startInterest(2,10,DataType.TYPEA);
+    //seed another node with generatedData (tell it that it makes a certain type of data)
+    allNodes.get(1).startGeneration(DataType.TYPEA);
+
+    boolean keepgoing = true; //whether we are not done the simulation.
+    int timeCount = 0; //current time-stamp in the simulator
+    while(keepgoing)
+    {
+      for(Node nod : allNodes)
+      {
+        // Do all of the sending.
+        nod.run();
+      }
+
+      System.out.println("done all of the sending for time count: " + timeCount);
+      keepgoing = false;
+
+      for(Node nod : allNodes)
+      {
+        // Check if any nodes have work still to be done.
+        keepgoing = keepgoing || nod.isThereStillWorkToBeDone();
+      }
+      timeCount++;
+    }
+    System.out.println("\n\n~* The Simulation Is Over *~");
   }
 
   public static void assertTest(boolean test, String value)
