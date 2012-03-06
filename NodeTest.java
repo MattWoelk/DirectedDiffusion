@@ -37,7 +37,7 @@ public class NodeTest
     System.out.println("Shuffled nodes.");
 
     //seed the first node with an interest
-    allNodes.get(0).startInterest(2,10,DataType.TYPEA);
+    allNodes.get(0).startInterest(2,10,DataType.TYPEA,currentTime);
     //seed another node with generatedData (tell it that it makes a certain type of data)
     allNodes.get(1).startGeneration(DataType.TYPEA);
 

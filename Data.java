@@ -1,7 +1,7 @@
 public class Data
 {
   public int datum;
-  public DataType dType; //Does this really need to be in here? It's already in Packet.
+  public DataType dType;
 
   public Data(int datum, DataType dType)
   {
