@@ -34,10 +34,10 @@ public class Node
     this.numNodes = numNodes;
   }
 
-  public void run() //This runs at each time-stamp
+  public void run(long currentTime) //This runs at each time-stamp
   {
     //send all interests in the queue.
-    sendInterests();
+    sendInterests(currentTime);
     //send all expData
     sendExploratoryData();
     //send all reinforments
@@ -71,7 +71,7 @@ public class Node
     //TODO
   }
 
-  public void sendInterests()
+  public void sendInterests(long currentTime)
   {
     //TODO
   }

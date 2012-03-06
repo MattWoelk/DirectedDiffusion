@@ -83,3 +83,4 @@ In run(), all of the sending of information happens.
 Things to keep in mind:
 Should there be a global counter of id so that none are every repeated ???
   - doesn't really have an analog in reality.
+  - use a timestamp! :)

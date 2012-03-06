@@ -7,7 +7,7 @@ import java.sql.Date;
 public class NodeTest
 {
   static int dimension = 4, numNodes = 10, radioRange = 4; //will be set by user
-  public static int currentTime = 0;
+  public static long currentTime = 0;
 
   public static void main(String[] args)
   {
@@ -42,16 +42,15 @@ public class NodeTest
     allNodes.get(1).startGeneration(DataType.TYPEA);
 
     boolean keepgoing = true; //whether we are not done the simulation.
-    int timeCount = 0; //current time-stamp in the simulator
     while(keepgoing)
     {
       for(Node nod : allNodes)
       {
         // Do all of the sending.
-        nod.run();
+        nod.run(currentTime);
       }
 
-      System.out.println("done all of the sending for time count: " + timeCount);
+      System.out.println("done all of the sending for time count: " + currentTime);
       keepgoing = false;
 
       for(Node nod : allNodes)
@@ -59,7 +58,7 @@ public class NodeTest
         // Check if any nodes have work still to be done.
         keepgoing = keepgoing || nod.isThereStillWorkToBeDone();
       }
-      timeCount++;
+      currentTime++;
     }
     System.out.println("\n\n~* The Simulation Is Over *~");
   }
