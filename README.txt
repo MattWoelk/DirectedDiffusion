@@ -25,23 +25,15 @@ Lists:
 - reinforcements          monocast  (datum is null)
 - unsent reinforced data  monocast
   - sent to the corresponding reinforcement id
-- reinforced data requests(Packet)
-- Interests send as the sink
+- interestsSentAsTheSink
   - so we can refer back and see which was sent by the current node.
-- Interests to respond to as the source
+- interstsToRespondToAsTheSource
   - interests to be responded to as reinforced data
-
-Take in packet. Parse it. It is either an interest, exp data, or reinforcement
-
-Interests: broadcast; known: sender and type and id
-ExpData  : broadcast; known: sender and type and id
-Reinforce: monocast ; known: to and data
-reinfData: monocast ; known: to and data
 
 
 What to do if the following is received:
 
-- all share the same ID
+- all share the same ID as the original interest which was sent
 
 interest
   - store who sent it for this id (only store one per id)
@@ -67,45 +59,46 @@ reinforced data
 
 
 
-How to do timings:
-- Have a run() command for each node which runs each of its functions for one
+How Timings Are Done:
+- Have a run() command for each node which runs each of its functions for each
   iteration.
 - A global counter would be incremented which would be used to store timestamps.
-  It will be accessible from a static getCurrentTime() function in the Node
-  class.
 
 In run(), all of the sending of information happens.
   - send interest
   - send expdata
-  - send reinforcement
+  - send reinforcements
+  - send reinforcement data
   - generate data (send reinforced data)
     - wait for the reinforcement data before sending these for the first time
-    - after the first time, just send them every few time ticks or something
+    - after the first time, just send them every assigned period
   - each "ROUND" is one time-stamp's worth of time.
 
-Energy is stored for the entire system in a TotalEnergy
+Energy is stored for each node in nodeEnergyUsed
 - a broadcast uses the same amount of energy as a monocast
+- each message sent uses 1 unit of energy.
 
 
 
 Limitations of the code to keep in mind:
 - Nodes currently hold on to every packet they receive forever. It may be good
-(for ram-usage) to give them a time limit.
+  (for ram-usage) to give them a time limit.
 - Each node can only have one type of data which it generates in the current
-implementation at any one time.
+  implementation at any one time.
 - All packets are sent from any node all at the same time.
   - the only time which is taken into account is the time required to send all
     nodes at once.
   - this could be changed; we could have a queue of packets; one being sent at
     each run().
-  - this will not affect the calculation of energy, which is stored in the
-    TotalEnergy variable.
+  - therefore, time-stamps don't really mean anything important in this
+    simulator.
+  - this will not affect the calculation of energy.
 - There is a global counter of id so that none are ever repeated
   - it is just a time-stamp! :)
     - make sure that two nodes don't both send an interest for the same thing at
       the same time. (This would not be a limitation in the real world, because
-the time-stamp would be accurate enough that the probability of this happening
-would be very small.)
+      the time-stamp would be accurate enough that the probability of this happening
+      would be very small.)
     - we could use a counter instead, then say that in real-life we'd use a
       time-stamp. //TODO
 - there can only be one sink for any time of data at any one point in time
@@ -126,4 +119,4 @@ o - -+   : Reinforcement from Sink          (monocast)
 
 o - - -+ : Reinforced Data from Source      (monocast)
 - - - -+ : Reinforced Data passing through  (monocast)
-  - - -o : Reinforced Data Hit Sink         (monocast) (doesn't use energy)
+  - - -o : Reinforced Data Hit Sink         (receiving; doesn't use energy)

@@ -6,7 +6,7 @@ import java.sql.Date;
 
 public class NodeTest
 {
-  static int dimension = 4, numNodes = 10, radioRange = 4; //will be set by user
+  static int dimension = 10, numNodes = 50, radioRange = 4; //will be set by user
   public static long currentTime = 0;
 
   public static void main(String[] args)
@@ -56,7 +56,7 @@ public class NodeTest
         nod.run(currentTime);
       }
 
-      System.out.println("   DONE ROUND: " + currentTime);
+      System.out.println("     | DONE ROUND: " + currentTime);
 
       // Check if any nodes have work still to be done.
       keepgoing = false;
@@ -80,6 +80,8 @@ public class NodeTest
       energySum+= allNodes.get(i).nodeEnergyUsed;
     }
     System.out.println("Total Energy Used: " + energySum);
+    if(allNodes.get(0).myNeighbors.contains(allNodes.get(1)))
+      System.out.println("Nodes 0 and 1 were right beside each other.");
   }
 
   public static void assertTest(boolean test, String value)
