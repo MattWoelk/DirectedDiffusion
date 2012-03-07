@@ -76,7 +76,7 @@ public class Node
     Packet pkt = new Packet(this, PacketType.INTEREST, currentTime, false, type, null, amount, period);
     interestsSentAsTheSink.add(pkt);
     broadcast(pkt);
-    System.out.println("o+");
+    System.out.println("oE");
   }
 
   public void receivePacket(Packet pkt)
@@ -170,9 +170,21 @@ public class Node
         break;
 
       case REINFORCEDDATA:
-        //Even if we have this ID already, send it anyway...
-        //  - it won't be an endless loop because everything is monocast.
-        //TODO: see if it's for me!
+        boolean foundIt = false;
+        // See if the packet is for me
+        for(Packet p : interestsSentAsTheSink)
+        {
+          if(p.id == pkt.id)
+          {
+            System.out.println("- - - -o  Sink received data: " + pkt.datum.datum + "\t id: " + pkt.id);
+            foundIt = true;
+            break;
+          }
+        }
+        if(!foundIt)
+        {
+          reinforcedData.add(pkt);
+        }
         break;
 
       default:
@@ -191,7 +203,7 @@ public class Node
       {
         broadcast(pkt);
         pkt.ifsent = true;
-        System.out.println("-+");
+        System.out.println("-E");
       }
     }
   }
@@ -205,7 +217,7 @@ public class Node
       {
         broadcast(pkt);
         pkt.ifsent = true;
-        System.out.println("- -+");
+        System.out.println("- -E");
       }
     }
   }
@@ -287,7 +299,7 @@ public class Node
         broadcast(new Packet(this, PacketType.EXPLORATORYDATA, requestID, false, genType, genData, pkt.requestedAmount, pkt.requestedPeriod));
         pkt.ifsent = true;
         //genPeriodCounter = 0;
-        System.out.println("o -+");
+        System.out.println("o -E");
       }
     }
 

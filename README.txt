@@ -57,7 +57,7 @@ reinforcement
 
 reinforced data
   - store unsent reinforced data packets in a list
-  - in run(), send to the fastest interest sender for this id
+  - in run(), send to the fastest interest (reinforcement?) sender for this id
 
 
 
@@ -93,3 +93,19 @@ Each node can only have one type of data which it generates in the current imple
 All packets are sent from any node all at the same time.
   - the only time which is taken into account is the time required to send all nodes at once.
   - this could be changed; we could have a queue of packets; one being sent at each run().
+
+
+
+Output Legend:
+oE       : Interest from sink
+-E       : Interest passing through
+
+o -E     : Exploratory Data from Source
+- -E     : Exploratory Data passing through
+
+o - -+   : Reinforcement from Sink
+- - -+   : Reinforcement passing through
+
+o - - -+ : Reinforced Data from Source
+- - - -+ : Reinforced Data passing through
+- - - -o : Reinforced Data Hit Sink
