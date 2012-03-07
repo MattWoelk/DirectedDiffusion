@@ -24,6 +24,8 @@ public class Node
   ArrayList<Node> allNodes;                            // every node in the entire network
   ArrayList<Node> myNeighbors = new ArrayList<Node>(); // neighbouring nodes
 
+  public int nodeEnergyUsed = 0;
+
   public int nodeID;
   public int xCoord;
   public int yCoord;
@@ -74,6 +76,12 @@ public class Node
   {
     Packet pkt = new Packet(this, PacketType.INTEREST, currentTime, false, type, null, amount, period);
     interestsSentAsTheSink.add(pkt);
+
+    // Make sure we don't re-send this packet when it comes back to us.
+    Packet tmp = pkt.clone();
+    tmp.ifsent = true;
+    interests.add(tmp);
+
     System.out.println("oE");
     broadcast(pkt);
   }
@@ -131,6 +139,7 @@ public class Node
           {
             //Send reinforcement.
             reinforcements.add(new Packet(this, PacketType.REINFORCEMENT, pkt.id, false, pkt.dType, null, pkt.requestedAmount, pkt.requestedPeriod));
+            pkt.ifsent = true; // so that we don't resend a packet which is for us.
             break;
           }
         }
@@ -173,7 +182,7 @@ public class Node
         {
           if(p.id == pkt.id)
           {
-            System.out.println("- - - -o  Sink received data: " + pkt.datum.datum + "\t id: " + pkt.id);
+            System.out.println("  - - -o  Sink received data: \t" + pkt.datum.datum + "\t id: " + pkt.id);
             foundIt = true;
             break;
           }
@@ -347,6 +356,9 @@ public class Node
 
   public void broadcast(Packet pkt)
   {
+//    if(nodeID == 0) //Single out a specific node for testing
+//      System.out.println("==== Node " + nodeID + " sent Packet. id: " + pkt.id + ", sender: " + pkt.sender.nodeID + ", pType: " + pkt.pType);
+    nodeEnergyUsed++;
     for(Node nod : myNeighbors)
     {
       nod.receivePacket(pkt.clone());
@@ -355,6 +367,9 @@ public class Node
 
   public void monocast(Packet pkt, Node nod)
   {
+//    if(nodeID == 0) //Single out a specific node for testing
+//      System.out.println("==== Node " + nodeID + " sent Packet. id: " + pkt.id + ", sender: " + pkt.sender.nodeID + ", pType: " + pkt.pType);
+    nodeEnergyUsed++;
     nod.receivePacket(pkt.clone());
   }
 
@@ -390,7 +405,7 @@ public class Node
     this.allNodes = allNodes;
   }
 
-  public void findNeighbors()
+  public void findNeighbors() //TODO: Something is wrong here.
   {
     for(int i=0; i<numNodes; i++)
     {
