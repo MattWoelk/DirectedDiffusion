@@ -36,10 +36,11 @@ public class NodeTest
     Collections.shuffle(allNodes);  //Randomizes the order of the nodes in the list.
     System.out.println("Shuffled nodes.");
 
-    //seed the first node with an interest
-    allNodes.get(0).startInterest(2,10,DataType.TYPEA,currentTime);
+    //the order of the next two commands are important.
     //seed another node with generatedData (tell it that it makes a certain type of data)
     allNodes.get(1).startGeneration(DataType.TYPEA);
+    //seed the first node with an interest
+    allNodes.get(0).startInterest(2,10,DataType.TYPEA,currentTime);
 
     boolean keepgoing = true; //whether we are not done the simulation.
     while(keepgoing)
@@ -50,7 +51,7 @@ public class NodeTest
         nod.run(currentTime);
       }
 
-      System.out.println("done all of the sending for time count: " + currentTime);
+      System.out.println("   DONE ROUND: " + currentTime);
       keepgoing = false;
 
       for(Node nod : allNodes)
@@ -59,6 +60,9 @@ public class NodeTest
         keepgoing = keepgoing || nod.isThereStillWorkToBeDone();
       }
       currentTime++;
+      //System.out.println("done all of the keepgoings for time count: " + currentTime);
+//      if(currentTime == 5)
+//        keepgoing = false;
     }
     System.out.println("\n\n~* The Simulation Is Over *~");
   }

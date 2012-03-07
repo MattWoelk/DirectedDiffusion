@@ -86,6 +86,7 @@ Should there be a global counter of id so that none are every repeated ???
   - doesn't really have an analog in reality.
   - use a time-stamp! :)
     - make sure that two nodes don't both send an interest for the same thing at the same time. (This would not be a limitation in the real world, because the time-stamp would be accurate enough that the probability of this happening would be very small.)
+    - we could use a counter instead, then say that in real-life we'd use a time-stamp. TODO
 Whenever there is a packet sent, it will be cloned as it is being sent.
 Nodes currently hold on to every packet they receive forever. It may be good (for ram-usage) to give them a time limit.
 Each node can only have one type of data which it generates in the current implementation.
