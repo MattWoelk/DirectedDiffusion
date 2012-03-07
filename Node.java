@@ -60,7 +60,6 @@ public class Node
   {
     genType = dType;
     generating = true;
-    System.out.println("I am generating data.");
   }
 
   public void generateData()
@@ -75,8 +74,8 @@ public class Node
   {
     Packet pkt = new Packet(this, PacketType.INTEREST, currentTime, false, type, null, amount, period);
     interestsSentAsTheSink.add(pkt);
-    broadcast(pkt);
     System.out.println("oE");
+    broadcast(pkt);
   }
 
   public void receivePacket(Packet pkt)
@@ -132,8 +131,6 @@ public class Node
           {
             //Send reinforcement.
             reinforcements.add(new Packet(this, PacketType.REINFORCEMENT, pkt.id, false, pkt.dType, null, pkt.requestedAmount, pkt.requestedPeriod));
-            System.out.println("We started this.");
-            System.out.println();
             break;
           }
         }
@@ -201,9 +198,9 @@ public class Node
     {
       if(pkt.ifsent == false)
       {
+        System.out.println("-E");
         broadcast(pkt);
         pkt.ifsent = true;
-        System.out.println("-E");
       }
     }
   }
@@ -215,9 +212,9 @@ public class Node
     {
       if(pkt.ifsent == false)
       {
+        System.out.println("- -E");
         broadcast(pkt);
         pkt.ifsent = true;
-        System.out.println("- -E");
       }
     }
   }
@@ -248,13 +245,13 @@ public class Node
           System.out.println("could not find who to send reinf to.");
           return;
         }
-        monocast(reinforcements.get(i), sendTo);
         if(reinforcements.get(i).sender == this)
         {
           System.out.println("o - -+");
         }else{
           System.out.println("- - -+");
         }
+        monocast(reinforcements.get(i), sendTo);
         reinforcements.get(i).ifsent = true;
       }
     }
@@ -283,9 +280,9 @@ public class Node
           System.out.println("could not find who to send reinfdata to.");
           return;
         }
+        System.out.println("- - - -+");
         monocast(pkt, sendTo);
         pkt.ifsent = true;
-        System.out.println("- - - -+");
       }
     }
   }
@@ -296,10 +293,10 @@ public class Node
     {
       if(pkt.ifsent == false)
       {
-        broadcast(new Packet(this, PacketType.EXPLORATORYDATA, requestID, false, genType, genData, pkt.requestedAmount, pkt.requestedPeriod));
-        pkt.ifsent = true;
         //genPeriodCounter = 0;
         System.out.println("o -E");
+        broadcast(new Packet(this, PacketType.EXPLORATORYDATA, requestID, false, genType, genData, pkt.requestedAmount, pkt.requestedPeriod));
+        pkt.ifsent = true;
       }
     }
 
@@ -344,8 +341,8 @@ public class Node
       System.out.println("could not find who to send reinfdata to [from source].");
       return;
     }
-    monocast(new Packet(this, PacketType.REINFORCEDDATA, requestID, false, genType, genData, pkt.requestedAmount, pkt.requestedPeriod), sendTo);
     System.out.println("o - - -+");
+    monocast(new Packet(this, PacketType.REINFORCEDDATA, requestID, false, genType, genData, pkt.requestedAmount, pkt.requestedPeriod), sendTo);
   }
 
   public void broadcast(Packet pkt)

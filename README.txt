@@ -97,15 +97,15 @@ All packets are sent from any node all at the same time.
 
 
 Output Legend:
-oE       : Interest from sink
--E       : Interest passing through
+oE       : Interest from sink               (broadcast)
+-E       : Interest passing through         (broadcast)
 
-o -E     : Exploratory Data from Source
-- -E     : Exploratory Data passing through
+o -E     : Exploratory Data from Source     (broadcast)
+- -E     : Exploratory Data passing through (broadcast)
 
-o - -+   : Reinforcement from Sink
-- - -+   : Reinforcement passing through
+o - -+   : Reinforcement from Sink          (monocast)
+- - -+   : Reinforcement passing through    (monocast)
 
-o - - -+ : Reinforced Data from Source
-- - - -+ : Reinforced Data passing through
-- - - -o : Reinforced Data Hit Sink
+o - - -+ : Reinforced Data from Source      (monocast)
+- - - -+ : Reinforced Data passing through  (monocast)
+- - - -o : Reinforced Data Hit Sink         (monocast)
