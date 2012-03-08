@@ -9,7 +9,7 @@ public class Node
   ArrayList<Packet> reinforcements = new ArrayList<Packet>();  // reinforcements to be sent along
   ArrayList<Packet> reinforcedData = new ArrayList<Packet>();  // reinforced data to be sent along
 
-  ArrayList<Packet> interestsSentAsTheSink = new ArrayList<Packet>();  // interests which initiated with this node
+  ArrayList<Packet> interestsSentAsTheSink = new ArrayList<Packet>();  // interests which initiated with this node, which is a sink
   ArrayList<Packet> interestsToRespondToAsTheSource = new ArrayList<Packet>();  // reinforced data to be sent from this Node, which is the source.
 
   boolean generating; // whether this node is generating data. Set at the beginning of the simulation by NodeTest
@@ -25,13 +25,13 @@ public class Node
   ArrayList<Node> allNodes;                            // every node in the entire network
   ArrayList<Node> myNeighbors = new ArrayList<Node>(); // neighbouring nodes
 
-  public int nodeEnergyUsed = 0;
+  public int nodeEnergyUsed = 0; //the total energy used by the node.
 
-  public int nodeID;
-  public int xCoord;
-  public int yCoord;
+  public int nodeID;     // the ID of this node (starting at 0)
+  public int xCoord;     // where this node is.
+  public int yCoord;     // where this node is.
   public int radioRange;
-  public int numNodes;
+  public int numNodes;   // the number of nodes in the entire network.
 
   public Node(int nodeID, int xCoord, int yCoord, int radioRange, int numNodes)
   {
@@ -44,18 +44,25 @@ public class Node
 
   public void run(long currentTime) //This runs at each time-stamp
   {
-    //System.out.println("- - running Node: " + this);
+    //System.out.println("- - running Node: " + nodeID);
     generateData();
+
     //send all interests in the queue.
     sendInterests();                    //broadcast
+
     //send all expData
     sendExploratoryDataPacketThrough(); //broadcast
+
     //send all reinforments
     sendReinforcements();               //monocast
+
     //send all reinforcedData
     sendReinforcedDataPacketThrough();  //monocast
-    //send one generated data if enough time has passed. This amount of time might be 1 unit, maybe 0, maybe way more.
+
+    //send one generated data if enough time has passed as exploratory data.
     sendExploratoryDataAsSource();      //broadcast
+
+    //reinforce a path
     sendReinforcedDataAsSource();       //monocast
   }
 
@@ -69,12 +76,14 @@ public class Node
   {
     if(generating)
     {
+      //generate random data
       genData = new Data((int)(Math.random()*256), genType);
     }
   }
 
   public void startInterest(int period, int amount, DataType type, long currentTime)
   {
+    //Seed an interest in the network.
     Packet pkt = new Packet(this, PacketType.INTEREST, currentTime, false, type, null, amount, period);
     interestsSentAsTheSink.add(pkt);
 
@@ -106,11 +115,10 @@ public class Node
         if(haveAlready)
           break;
 
-        //System.out.println("Send Interest along!");
+        //See if interest is for this node
         if(generating && genType == pkt.dType)
         {
           //It's for me; I am the source for this packet.
-          //System.out.println("THIS INTEREST IS FOR ME!!! :D  HEE YAW!!! WOO HOO!!!!");
           interestsToRespondToAsTheSource.add(pkt.clone());
         }
         interests.add(pkt); //send it along whether it's for me or not.
@@ -138,13 +146,13 @@ public class Node
           //see if this node started this id
           if(p.id == pkt.id)
           {
-            //Send reinforcement.
+            //This node started this id. Send reinforcement.
             reinforcements.add(new Packet(this, PacketType.REINFORCEMENT, pkt.id, false, pkt.dType, null, pkt.requestedAmount, pkt.requestedPeriod));
             pkt.ifsent = true; // so that we don't resend a packet which is for us.
             break;
           }
         }
-        exploratoryData.add(pkt); //if it's for us or not, send it along, but only send the first one we see.
+        exploratoryData.add(pkt); //if it's for us or not, but only send the first one we see.
 
         break;
 
@@ -172,8 +180,9 @@ public class Node
           genPeriod = pkt.requestedPeriod;
           requestID = pkt.id;
           genPeriodCounter = 0;
+          pkt.ifsent = true; //don't send along a packet which was for us. ONLY ONE SOURCE PER DATA TYPE.
         }
-        reinforcements.add(pkt); //send it along whether it's for me or not.
+        reinforcements.add(pkt); //add it to the list (to be sent if not for us)
         break;
 
       case REINFORCEDDATA:
@@ -183,6 +192,7 @@ public class Node
         {
           if(p.id == pkt.id)
           {
+            // It is for us! We are the sink for this packet.
             System.out.println("  - - -o  Sink Node: " + nodeID + " received data: \t" + pkt.datum.datum + "\t id: " + pkt.id);
             foundIt = true;
             break;
@@ -190,12 +200,12 @@ public class Node
         }
         if(!foundIt)
         {
-          reinforcedData.add(pkt);
+          reinforcedData.add(pkt); //if it wasn't for us, send it along.
         }
         break;
 
       default:
-        System.out.println("Error: No Packet Type.");
+        System.out.println("===ERROR===     No Packet Type.");
         break;
 
     }
@@ -241,6 +251,7 @@ public class Node
       if(reinforcements.get(i).ifsent == false)
       {
         //send to the node from the packet with this id from the exploratoryData list.
+        //there will only be one, and it will have been the fastest.
         for(Packet expkt : exploratoryData)
         {
           if(expkt.id == reinforcements.get(i).id)
@@ -262,7 +273,7 @@ public class Node
           System.out.println("- - -+");
         }
         if(!myNeighbors.contains(sendTo))
-          System.out.println("ERROR 404");
+          System.out.println("ERROR 404: Sending to non-neighbours");
         monocast(reinforcements.get(i), sendTo);
         reinforcements.get(i).ifsent = true;
       }
@@ -278,6 +289,7 @@ public class Node
       if(pkt.ifsent == false)
       {
         //send to the node from the packet with this id from the reinforcements list.
+        //there will only be one.
         for(Packet reinfpkt : reinforcements)
         {
           if(reinfpkt.id == pkt.id)
@@ -294,7 +306,7 @@ public class Node
         }
         System.out.println("- - - -+");
         if(!myNeighbors.contains(sendTo))
-          System.out.println("ERROR 403");
+          System.out.println("ERROR 403: Sending to non-neighbours");
         monocast(pkt, sendTo);
         pkt.ifsent = true;
       }
@@ -313,13 +325,13 @@ public class Node
         pkt.ifsent = true;
       }
     }
-
   }
 
   public void sendReinforcedDataAsSource()
   {
     Packet pkt = null;
     //This function will send data of type genType every genPeriod runs for a total of genAmount times.
+
     //check to see that we have received a request
     if(doneSendingRequestedGeneratedData)
       return;
@@ -332,13 +344,14 @@ public class Node
 
     genPeriodCounter++;
 
-    if(genPeriodCounter % genPeriod != 0)
+    if(genPeriodCounter % genPeriod != 0) // send a reinforced data packet every genPeriod time-stamps.
       return;
 
     genAmount--;
 
     Node sendTo = null;
     //send to the node from the packet with this id from the reinforcements list.
+    //there will only be one.
     for(Packet reinfpkt : reinforcements)
     {
       if(reinfpkt.id == requestID)
@@ -352,19 +365,19 @@ public class Node
 
     if(sendTo == null)
     {
-      System.out.println("could not find who to send reinfdata to [from source].");
+      System.out.println("===ERROR===    could not find who to send reinfdata to [from source].");
       return;
     }
     System.out.println("o - - -+");
-        if(!myNeighbors.contains(sendTo))
-          System.out.println("ERROR 402");
+    if(!myNeighbors.contains(sendTo))
+      System.out.println("ERROR 402: Sending to non-neighbours");
     monocast(new Packet(this, PacketType.REINFORCEDDATA, requestID, false, genType, genData, pkt.requestedAmount, pkt.requestedPeriod), sendTo);
   }
 
   public void broadcast(Packet pkt)
   {
-//    if(nodeID == 0) //Single out a specific node for testing
-//      System.out.println("==== Node " + nodeID + " sent Packet. id: " + pkt.id + ", sender: " + pkt.sender.nodeID + ", pType: " + pkt.pType);
+    //    if(nodeID == 0) //Single out a specific node for testing
+    //      System.out.println("==== Node " + nodeID + " sent Packet. id: " + pkt.id + ", sender: " + pkt.sender.nodeID + ", pType: " + pkt.pType);
     Packet tmp;
     nodeEnergyUsed++;
     for(Node nod : myNeighbors)
@@ -377,8 +390,8 @@ public class Node
 
   public void monocast(Packet pkt, Node nod)
   {
-//    if(nodeID == 0) //Single out a specific node for testing
-//      System.out.println("==== Node " + nodeID + " sent Packet. id: " + pkt.id + ", sender: " + pkt.sender.nodeID + ", pType: " + pkt.pType);
+    //    if(nodeID == 0) //Single out a specific node for testing
+    //      System.out.println("==== Node " + nodeID + " sent Packet. id: " + pkt.id + ", sender: " + pkt.sender.nodeID + ", pType: " + pkt.pType);
     Packet tmp;
     nodeEnergyUsed++;
     if(!myNeighbors.contains(nod))
@@ -432,7 +445,7 @@ public class Node
 
         if(xDiff <= radioRange && yDiff <= radioRange)
         {
-//          System.out.println("Node " + nodeID + " is adding node " + allNodes.get(i).nodeID + " to its neighbours. It is as far away as x = " + xDiff + " and y = " + yDiff);
+          //          System.out.println("Node " + nodeID + " is adding node " + allNodes.get(i).nodeID + " to its neighbours. It is as far away as x = " + xDiff + " and y = " + yDiff);
           myNeighbors.add(allNodes.get(i));
         }
       }
