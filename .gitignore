@@ -6,5 +6,6 @@ documentation/*
 *.pdf
 *.ppt*
 *.zip
+*.csv
 first/*
 second/*
