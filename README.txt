@@ -83,6 +83,7 @@ Energy is stored for each node in nodeEnergyUsed
 Limitations of the code to keep in mind:
 - Nodes currently hold on to every packet they receive forever. It may be good
   (for ram-usage) to give them a time limit.
+  - this includes nodeLevels.
 - Each node can only have one type of data which it generates in the current
   implementation at any one time.
 - All packets are sent from any node all at the same time.
@@ -102,7 +103,7 @@ Limitations of the code to keep in mind:
     - we could use a counter instead, then say that in real-life we'd use a
       time-stamp. //TODO
 - there can only be one sink for any time of data at any one point in time
-  - multiple gradients will NOT be made; only one per type at any point.
+  - multiple gradients will NOT be made; only one per type at any point in time.
 
 
 
@@ -120,3 +121,56 @@ o - -+   : Reinforcement from Sink          (monocast)
 o - - -+ : Reinforced Data from Source      (monocast)
 - - - -+ : Reinforced Data passing through  (monocast)
   - - -o : Reinforced Data Hit Sink         (receiving; doesn't use energy)
+
+
+Extension: HDA - Hierarchical Data Aggregation
+
+- Hierarchical levels are stored in each node and in each interest packet
+- Sink is level 0
+When receiving an interest:
+  - if we do not have one for this id yet, keep it
+  - if the sending node's id is equal to or more than ours, ignore the packet
+  - if the sending node's id is one less than ours, add it to the list
+  - if the sending node's id is two or more than ours, delete the list and add this one
+When sending exploratory data:
+  - MULTICAST to all nodes which are in the list for this id.
+  - send the source's id so that the intermediate nodes can count from how many they received them.
+
+When receiving exp data:
+  - if this is from a new id, add it. Also, add 1 to the number of connected sources this node has for this id. *List*
+  - if this is from a known id but a new source, add it.
+  - if you received one with this id from this source already, dump it.
+
+When sending reinforcements:
+  - send the number of connected sources this node has for this id.
+  - monocast? broadcast? multicast?
+
+When receiving reinforcements:
+  - store all received
+
+When sending reinforcement data:
+  - send to the parent with the highest number of connected sources for this id.
+
+SIMPLIFICATION:
+- just do the "only send expdata to parents" thing and nothing else.
+- maybe I'll start with just this and see where things go from there. :)
+  - I'll call it: "A Hierarchal exploratory data optimization."
+- because of how this simulator works, all nodes which are the closest will send their 
+
+TODO:
+[done] add level to node.
+[] add level to interest packet
+[] put logic in to put these two things together.
+[] make multicast function
+[] implement multicast to parent nodes.
+
+
+QUESTIONS:
+For having two sources:
+- Will the sink have to wait a certain amount of time for all sources to get to it before sending it's reinforcement?
+  - It may have to send reinforcements with separate ids; one for each of the sources.
+  - For DD? For HDA?
+
+
+TODO Basic DD:
+[] put in logic to figure out if there is a route from the source to the sink or not.
