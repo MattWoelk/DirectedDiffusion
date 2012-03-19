@@ -159,9 +159,15 @@ SIMPLIFICATION:
 
 TODO:
 [done] add level to node.
-[] add level to interest packet
-[] put logic in to put these two things together.
+[done] add level to interest packet
+[done] put logic in to put these two things together.
+  [done] store more than one interest packet for a given id with the following logic:
+    [done] if none exist with this id, add it and set our level to it+1. (Send along it+1.)
+    [done] if some exist with this id and the new one's level is the same as the previous, add it.
+    [done] if the new one has an equal or higher level than us, ignore it.
 [] make multicast function
+  [] change send-interest function to multicast to all with this id in the list.
+  [] make sure multicast still counts as one unit of energy.
 [] implement multicast to parent nodes.
 
 

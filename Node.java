@@ -34,7 +34,7 @@ public class Node
   public int numNodes;   // the number of nodes in the entire network.
 
   // HDA THINGS
-  public ArrayList<NodeLevelObject> nodeLevels = new ArrayList<NodeLevelObject>();
+  public ArrayList<NodeLevelObject> nodeLevels = new ArrayList<NodeLevelObject>(); //THIS IS CURRENTLY NOT USED FOR THE SIMPLIFIED HDA.
 
   public Node(int nodeID, int xCoord, int yCoord, int radioRange, int numNodes)
   {
@@ -105,24 +105,43 @@ public class Node
     {
       //see if we have one with this id already
       boolean haveAlready = false;
+      boolean sameLevel = false;
       for(InterestPacket p : interests)
       {
         if(p.id == pkt.id)
         {
           //We already have this ID. Ignore this packet.
           haveAlready = true;
+          if(p.level == ((InterestPacket)pkt).level)
+            sameLevel = true; //we only need to check once because all packets will be sent at the same "time" if they are the same distance away.
           break;
         }
       }
-      if(haveAlready)
+      if(haveAlready && !sameLevel)
+      {
+        return; //new level will never be lower than current because all packets will be sent at the same "time" if they are the same distance away, and if level is higher then we don't care about it.
+      }
+
+      InterestPacket tmp = ((InterestPacket)pkt).clone();
+      tmp.level++;
+
+      if(sameLevel)
+      {
+        tmp.ifsent = true; //We already sent one of these; don't send another.
+        interests.add((InterestPacket)tmp); //send it along whether it's for me or not.
         return;
+      }
+
+      //Set our level for this id.
+      setOurLevel(pkt.id, ((InterestPacket)pkt).level + 1);
 
       //See if interest is for this node
       if(generating && genType == pkt.dType)
       {
         //It's for me; I am the source for this packet.
-        interestsToRespondToAsTheSource.add(((InterestPacket)pkt).clone());
+        interestsToRespondToAsTheSource.add(tmp);
       }
+
       interests.add((InterestPacket)pkt); //send it along whether it's for me or not.
     }
     else if(pkt instanceof ExploratoryDataPacket)
@@ -448,6 +467,25 @@ public class Node
           myNeighbors.add(allNodes.get(i));
         }
       }
+    }
+  }
+
+  public void setOurLevel(long id, int level)
+  {
+    boolean found = false;
+
+    for(NodeLevelObject n : nodeLevels)
+    {
+      if(n.id == id)
+      {
+        found = true;
+        break;
+      }
+    }
+
+    if(!found)
+    {
+      nodeLevels.add(new NodeLevelObject(id, level));
     }
   }
 
