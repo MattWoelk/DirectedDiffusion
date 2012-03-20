@@ -112,8 +112,8 @@ Output Legend:
 oE       : Interest from sink               (broadcast)
 -E       : Interest passing through         (broadcast)
 
-o -E     : Exploratory Data from Source     (broadcast)
-- -E     : Exploratory Data passing through (broadcast)
+o -{     : Exploratory Data from Source     (multicast)
+- -{     : Exploratory Data passing through (multicast)
 
 o - -+   : Reinforcement from Sink          (monocast)
 - - -+   : Reinforcement passing through    (monocast)
@@ -165,7 +165,7 @@ TODO:
     [done] if none exist with this id, add it and set our level to it+1. (Send along it+1.)
     [done] if some exist with this id and the new one's level is the same as the previous, add it.
     [done] if the new one has an equal or higher level than us, ignore it.
-[] make multicast function
+[done] make multicast function
   [] change send-interest function to multicast to all with this id in the list.
   [] make sure multicast still counts as one unit of energy.
 [] implement multicast to parent nodes.

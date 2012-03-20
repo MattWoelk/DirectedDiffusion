@@ -95,6 +95,8 @@ public class Node
     tmp.ifsent = true;
     interests.add(tmp);
 
+    setOurLevel(currentTime, 0);
+
     System.out.println("oE");
     broadcast(pkt);
   }
@@ -108,7 +110,7 @@ public class Node
       boolean sameLevel = false;
       for(InterestPacket p : interests)
       {
-        if(p.id == pkt.id)
+        if(p.id == pkt.id) //TODO: make this logic compare to OUR level instead of the level of things which we have received.
         {
           //We already have this ID. Ignore this packet.
           haveAlready = true;
@@ -129,6 +131,7 @@ public class Node
       {
         tmp.ifsent = true; //We already sent one of these; don't send another.
         interests.add((InterestPacket)tmp); //send it along whether it's for me or not.
+        System.out.println("Node " + nodeID + " added Node " + tmp.sender.nodeID + " to its interests list at the SAME level.");
         return;
       }
 
@@ -139,10 +142,12 @@ public class Node
       if(generating && genType == pkt.dType)
       {
         //It's for me; I am the source for this packet.
-        interestsToRespondToAsTheSource.add(tmp);
+        InterestPacket tmp2 = tmp.clone();
+        interestsToRespondToAsTheSource.add(tmp2);
       }
 
-      interests.add((InterestPacket)pkt); //send it along whether it's for me or not.
+      interests.add(tmp); //send it along whether it's for me or not.
+      System.out.println("Node " + nodeID + " added Node " + pkt.sender.nodeID + " to its interests list at the SEND-TO level.");
     }
     else if(pkt instanceof ExploratoryDataPacket)
     {
@@ -237,6 +242,7 @@ public class Node
       if(pkt.ifsent == false)
       {
         System.out.println("-E");
+        //Send out the broadcast
         broadcast(pkt);
         pkt.ifsent = true;
       }
@@ -245,13 +251,24 @@ public class Node
 
   public void sendExploratoryDataPacketThrough()
   {
-    // send all of the unsent expData packets.
+    ArrayList<Node> nods;
     for(ExploratoryDataPacket pkt : exploratoryData)
     {
       if(pkt.ifsent == false)
       {
-        System.out.println("- -E");
-        broadcast(pkt);
+        System.out.println("- -{");
+        //Figure out who to multicast to
+        nods = new ArrayList<Node>();
+        for(InterestPacket intP : interests)
+        {
+          if(intP.id == pkt.id)
+          {
+            nods.add(intP.sender);
+          }
+        }
+
+        //Send out the multicast
+        multicast(pkt, nods);
         pkt.ifsent = true;
       }
     }
@@ -333,13 +350,22 @@ public class Node
 
   public void sendExploratoryDataAsSource()
   {
+    ArrayList<Node> nods;
     for(InterestPacket pkt : interestsToRespondToAsTheSource)
     {
       if(pkt.ifsent == false)
       {
+        nods = new ArrayList<Node>();
+        for(InterestPacket intP : interests)
+        {
+          if(intP.id == pkt.id)
+          {
+            nods.add(intP.sender);
+          }
+        }
         //genPeriodCounter = 0;
         System.out.println("o -E");
-        broadcast(new ExploratoryDataPacket(this, requestID, false, genType, genData, pkt.requestedAmount, pkt.requestedPeriod));
+        multicast(new ExploratoryDataPacket(this, requestID, false, genType, genData, pkt.requestedAmount, pkt.requestedPeriod), nods);
         pkt.ifsent = true;
       }
     }
@@ -419,6 +445,21 @@ public class Node
     nod.receivePacket(tmp);
   }
 
+  public void multicast(Packet pkt, ArrayList<Node> nods)
+  {
+    Packet tmp;
+    nodeEnergyUsed++;
+    for(Node nod : nods)
+    {
+      if(!myNeighbors.contains(nod))
+        System.out.println("===ERROR===               monocast sent to node: " + nod.nodeID + ", which is NOT A NEIGHBOUR");
+      tmp = pkt.clone();
+      tmp.sender = this;
+      nod.receivePacket(tmp);
+      System.out.println("multicasting to: " + nod.nodeID);
+    }
+  }
+
   public boolean isThereStillWorkToBeDone()
   {
     if(!doneSendingRequestedGeneratedData)
@@ -487,6 +528,19 @@ public class Node
     {
       nodeLevels.add(new NodeLevelObject(id, level));
     }
+  }
+
+  public int getOurLevel(long id)
+  {
+    int result = -1;
+
+    for(NodeLevelObject n : nodeLevels)
+    {
+      if(n.id == id)
+        return n.level;
+    }
+
+    return result; //result = -1, which means our level for this id has not yet been set.
   }
 
   class NodeLevelObject
