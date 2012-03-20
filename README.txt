@@ -180,3 +180,4 @@ For having two sources:
 
 TODO Basic DD:
 [] put in logic to figure out if there is a route from the source to the sink or not.
+[] make sure that a node will receive all of the packets in a turn before acting on them!!!!!!!!

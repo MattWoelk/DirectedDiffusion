@@ -105,49 +105,46 @@ public class Node
   {
     if(pkt instanceof InterestPacket)
     {
-      //see if we have one with this id already
-      boolean haveAlready = false;
-      boolean sameLevel = false;
-      for(InterestPacket p : interests)
-      {
-        if(p.id == pkt.id) //TODO: make this logic compare to OUR level instead of the level of things which we have received.
-        {
-          //We already have this ID. Ignore this packet.
-          haveAlready = true;
-          if(p.level == ((InterestPacket)pkt).level)
-            sameLevel = true; //we only need to check once because all packets will be sent at the same "time" if they are the same distance away.
-          break;
-        }
-      }
-      if(haveAlready && !sameLevel)
-      {
-        return; //new level will never be lower than current because all packets will be sent at the same "time" if they are the same distance away, and if level is higher then we don't care about it.
-      }
-
       InterestPacket tmp = ((InterestPacket)pkt).clone();
       tmp.level++;
 
-      if(sameLevel)
-      {
-        tmp.ifsent = true; //We already sent one of these; don't send another.
-        interests.add((InterestPacket)tmp); //send it along whether it's for me or not.
-        System.out.println("Node " + nodeID + " added Node " + tmp.sender.nodeID + " to its interests list at the SAME level.");
-        return;
-      }
-
-      //Set our level for this id.
-      setOurLevel(pkt.id, ((InterestPacket)pkt).level + 1);
-
       //See if interest is for this node
+      //  if it is, see if we have one with this id in our interestsToRespondToAsTheSource, and if there is not one there, add it.
       if(generating && genType == pkt.dType)
       {
         //It's for me; I am the source for this packet.
-        InterestPacket tmp2 = tmp.clone();
-        interestsToRespondToAsTheSource.add(tmp2);
+        boolean haveintrespalready = false;
+        for(InterestPacket intpp : interestsToRespondToAsTheSource)
+        {
+          if(intpp.id == pkt.id)
+          {
+            haveintrespalready = true;
+            break;
+          }
+        }
+        if(!haveintrespalready)
+          interestsToRespondToAsTheSource.add(tmp.clone());
       }
 
-      interests.add(tmp); //send it along whether it's for me or not.
-      System.out.println("Node " + nodeID + " added Node " + pkt.sender.nodeID + " to its interests list at the SEND-TO level.");
+      //get our current level for this id
+      int curLevel = getOurLevel(pkt.id);
+      //  if it's -1, add this packet to our interests and set our level.
+      if(curLevel == -1)
+      {
+        interests.add(tmp);
+        setOurLevel(tmp.id, tmp.level);
+      }
+      //  if it's greater than the level for this packet, add this packet to our interests.
+      else if(curLevel > ((InterestPacket)pkt).level)
+      {
+        tmp.ifsent = true;
+        interests.add(tmp);
+      }
+      //  if it's lower or equal to the id for this packet, abandon it.
+      else
+      {
+        //do nothing.
+      }
     }
     else if(pkt instanceof ExploratoryDataPacket)
     {
@@ -456,7 +453,7 @@ public class Node
       tmp = pkt.clone();
       tmp.sender = this;
       nod.receivePacket(tmp);
-      System.out.println("multicasting to: " + nod.nodeID);
+      //System.out.println("multicasting to: " + nod.nodeID);
     }
   }
 
