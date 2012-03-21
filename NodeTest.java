@@ -11,6 +11,8 @@ public class NodeTest
 {
   static int dimension = 10, numNodes = 50, radioRange = 4; //will be set by user
   public static long currentTime = 0;
+  static boolean lastonly = false;
+  static boolean suppressOutput = false;
 
   public static OutputMaker maker;
 
@@ -24,6 +26,33 @@ public class NodeTest
         {
           maker = new OutputMaker(s.substring(s.indexOf("=")+1));
         }catch(IOException e){maker=null;}
+      }
+      else if(s.startsWith("--filename-last-only="))
+      {
+        try
+        {
+          maker = new OutputMaker(s.substring(s.indexOf("=")+1));
+          lastonly = true;
+        }catch(IOException e){maker=null;}
+      }
+      else if(s.startsWith("--dimension="))
+      {
+        if(s.substring(s.indexOf("=")+1).length() != 0)
+          dimension = Integer.parseInt(s.substring(s.indexOf("=")+1));
+      }
+      else if(s.startsWith("--numNodes="))
+      {
+        if(s.substring(s.indexOf("=")+1).length() != 0)
+          numNodes = Integer.parseInt(s.substring(s.indexOf("=")+1));
+      }
+      else if(s.startsWith("--range="))
+      {
+        if(s.substring(s.indexOf("=")+1).length() != 0)
+          radioRange = Integer.parseInt(s.substring(s.indexOf("=")+1));
+      }
+      else if(s.startsWith("--suppressOutput"))
+      {
+        suppressOutput = true;
       }
     }
   }
@@ -44,7 +73,7 @@ public class NodeTest
 
     // CREATE THE NODES
     for(int i = 0; i < numNodes; i++) //Make the Nodes, giving them a random coordinate
-      allNodes.add(new Node(i, (int)gridPoints.get(i).getX(), (int)gridPoints.get(i).getY(), radioRange, numNodes));
+      allNodes.add(new Node(i, (int)gridPoints.get(i).getX(), (int)gridPoints.get(i).getY(), radioRange, numNodes, suppressOutput));
 
     for(int i = 0; i < numNodes; i++)
     { //Each node knows all nodes
@@ -78,14 +107,14 @@ public class NodeTest
         nod.run(currentTime);
       }
 
-      System.out.println("     | DONE ROUND: " + currentTime);
+      if(!suppressOutput) {System.out.println("     | DONE ROUND: " + currentTime);}
 
       // Check if any nodes have work still to be done.
       keepgoing = false;
       for(Node nod : allNodes)
       {
         keepgoing = keepgoing || nod.isThereStillWorkToBeDone();
-        if(maker!=null) { maker.AddOutput(currentTime + "," + nod.nodeID + "," + nod.nodeEnergyUsed + "\n");}
+        if(maker!=null && !lastonly) { maker.AddOutput(currentTime + "," + nod.nodeID + "," + nod.nodeEnergyUsed + "\n");}
       }
 
       //increment time to the next time-stamp
@@ -94,19 +123,39 @@ public class NodeTest
       //      if(currentTime == 5)
       //        keepgoing = false;
     }
-    System.out.println("\n\n~* The Simulation Is Over *~\n");
+    if(!keepgoing)
+    {
+      if(lastonly)
+      {
+        int numHops = 0;
+        //calculate how many hops there were
+        for(Node nod : allNodes)
+        {
+          if(nod.nodeEnergyUsed > 4)
+            numHops++;
+        }
+        //add how many hops to the csv file
+        if(maker!=null) { maker.AddOutput(numHops + "\n");}
+        //add the rest of the output information to the file
+        for(Node nod : allNodes)
+        {
+          if(maker!=null) { maker.AddOutput(nod.nodeID + "," + nod.nodeEnergyUsed + "\n");}
+        }
+      }
+    }
+    if(!suppressOutput) {System.out.println("\n\n~* The Simulation Is Over *~\n");}
     //if(maker!=null) { maker.AddOutput("Simulation Over."); }
-    System.out.println("Node Energy Uses Are As Follows:");
+    if(!suppressOutput) {System.out.println("Node Energy Uses Are As Follows:");}
     int energySum = 0;
     for(int i = 0; i < allNodes.size(); i++)
     {
-      System.out.println("Node: " + allNodes.get(i).nodeID + "\tenergy: " + allNodes.get(i).nodeEnergyUsed);
+      if(!suppressOutput) {System.out.println("Node: " + allNodes.get(i).nodeID + "\tenergy: " + allNodes.get(i).nodeEnergyUsed);}
       energySum+= allNodes.get(i).nodeEnergyUsed;
     }
-    System.out.println("Total Energy Used: " + energySum);
+    if(!suppressOutput) {System.out.println("Total Energy Used: " + energySum);}
     if(allNodes.get(0).myNeighbors.contains(allNodes.get(1)))
     {
-      System.out.println("Nodes 0 and 1 were right beside each other.");
+      if(!suppressOutput) {System.out.println("Nodes 0 and 1 were right beside each other.");}
       //if(maker != null) { maker.AddOutput("Nodes 0 and 1 were right beside each other" + "\n"); }
     }
   }
@@ -115,9 +164,9 @@ public class NodeTest
   {
     if(test)
     {
-      System.out.println("- PASSED TEST: " + value);
+      if(!suppressOutput) {System.out.println("- PASSED TEST: " + value);}
     }else{
-      System.out.println("==FAILED TEST: " + value);
+      if(!suppressOutput) {System.out.println("==FAILED TEST: " + value);}
     }
   }
 }

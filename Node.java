@@ -27,6 +27,8 @@ public class Node
 
   public int nodeEnergyUsed = 0; //the total energy used by the node.
 
+  public boolean suppressOutput = false;
+
   public int nodeID;     // the ID of this node (starting at 0)
   public int xCoord;     // where this node is.
   public int yCoord;     // where this node is.
@@ -36,13 +38,14 @@ public class Node
   // HDA THINGS
   public ArrayList<NodeLevelObject> nodeLevels = new ArrayList<NodeLevelObject>(); //THIS IS CURRENTLY NOT USED FOR THE SIMPLIFIED HDA.
 
-  public Node(int nodeID, int xCoord, int yCoord, int radioRange, int numNodes)
+  public Node(int nodeID, int xCoord, int yCoord, int radioRange, int numNodes, boolean suppressOutput)
   {
     this.nodeID = nodeID;
     this.xCoord = xCoord;
     this.yCoord = yCoord;
     this.radioRange = radioRange;
     this.numNodes = numNodes;
+    this.suppressOutput = suppressOutput;
   }
 
   public void run(long currentTime) //This runs at each time-stamp
@@ -97,7 +100,7 @@ public class Node
 
     setOurLevel(currentTime, 0);
 
-    System.out.println("oE");
+    if(!suppressOutput) {System.out.println("oE");}
     broadcast(pkt);
   }
 
@@ -215,7 +218,7 @@ public class Node
         if(p.id == pkt.id)
         {
           // It is for us! We are the sink for this packet.
-          System.out.println("  - - -o  Sink Node: " + nodeID + " received data: \t" + pkt.datum.datum + "\t id: " + pkt.id);
+          if(!suppressOutput) {System.out.println("  - - -o  Sink Node: " + nodeID + " received data: \t" + pkt.datum.datum + "\t id: " + pkt.id);}
           foundIt = true;
           break;
         }
@@ -238,7 +241,7 @@ public class Node
     {
       if(pkt.ifsent == false)
       {
-        System.out.println("-E");
+        if(!suppressOutput) {System.out.println("-E");}
         //Send out the broadcast
         broadcast(pkt);
         pkt.ifsent = true;
@@ -253,7 +256,7 @@ public class Node
     {
       if(pkt.ifsent == false)
       {
-        System.out.println("- -{");
+        if(!suppressOutput) {System.out.println("- -E");}
         //Figure out who to multicast to
         nods = new ArrayList<Node>();
         for(InterestPacket intP : interests)
@@ -295,14 +298,14 @@ public class Node
 
         if(sendTo == null)
         {
-          System.out.println("could not find who to send reinf to.");
+          if(!suppressOutput) {System.out.println("could not find who to send reinf to.");}
           return;
         }
         if(reinforcements.get(i).sender == this)
         {
-          System.out.println("o - -+");
+          if(!suppressOutput) {System.out.println("o - -+");}
         }else{
-          System.out.println("- - -+");
+          if(!suppressOutput) {System.out.println("- - -+");}
         }
         if(!myNeighbors.contains(sendTo))
           System.out.println("ERROR 404: Sending to non-neighbours");
@@ -333,10 +336,10 @@ public class Node
 
         if(sendTo == null)
         {
-          System.out.println("could not find who to send reinfdata to.");
+          System.out.println("===ERROR=== could not find who to send reinfdata to.");
           return;
         }
-        System.out.println("- - - -+");
+        if(!suppressOutput) {System.out.println("- - - -+");}
         if(!myNeighbors.contains(sendTo))
           System.out.println("ERROR 403: Sending to non-neighbours");
         monocast(pkt, sendTo);
@@ -361,7 +364,7 @@ public class Node
           }
         }
         //genPeriodCounter = 0;
-        System.out.println("o -E");
+        if(!suppressOutput) {System.out.println("o -E");}
         multicast(new ExploratoryDataPacket(this, requestID, false, genType, genData, pkt.requestedAmount, pkt.requestedPeriod), nods);
         pkt.ifsent = true;
       }
@@ -409,7 +412,7 @@ public class Node
       System.out.println("===ERROR===    could not find who to send reinfdata to [from source].");
       return;
     }
-    System.out.println("o - - -+");
+    if(!suppressOutput) {System.out.println("o - - -+");}
     if(!myNeighbors.contains(sendTo))
       System.out.println("ERROR 402: Sending to non-neighbours");
     monocast(new ReinforcedDataPacket(this, requestID, false, genType, genData, pkt.requestedAmount, pkt.requestedPeriod), sendTo);
